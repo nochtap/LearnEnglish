@@ -20,15 +20,16 @@
 	</head>
 	<body>
 		<div data-role="view" id="tabstrip-login" data-title="Login">
-			<h1>Login!</h1>
+			<h1>Login</h1>
 			<div id='helloWorldInput'>
-				<label for="txtName" style="display: inline-block;">Enter your name:</label>
-				<input type="text" id="txtName" value="" data-bind="value: UserName"/>
-				<br/>
-				<label for="txtPsw" style="display: inline-block;">Password:</label><br/>
-				<input type="password" id="txtName" value=""  data-bind="value: Password"/>
+				<label for="txtName" style="display: block;">Enter your name:</label>
+				<input type="text" id="txtName" value="" data-bind="value: UserName" class="input-field"/>
+				<br/><br/>
+				<label for="txtPsw" style="display: block;">Password:</label>
+				<input type="password" id="txtName" value=""  data-bind="value: Password" class="input-field"/>
 			</div>
 			<div id='helloWorldText' style="display:block;"></div>
+            <br />
 			<div class="buttonArea">
 				<a id="resetButton" data-role="button" data-click="reset" data-icon="refresh">Reset</a>
 				<a id="submitButton" data-role="button" data-click="login" data-icon="compose">Login</a>
@@ -64,22 +65,37 @@
 
 		<div data-role="view" id="tabstrip-wordlearn" data-title="Word learn" data-model="wordLearnViewModel" data-show="initWordLearnView">
 			<header>
-				<button data-role="backbutton">Back</button>
-				<div>Your high score: <span data-bind="html: highScore.value"></span></div>
-				<div>
+                <div class="margin10">				
+                    <button data-role="backbutton" class="iblock">Back</button>
 					<a href="HighScores.html" data-role="button">High scores</a>
                     <a data-role="button" data-click="getHelp">Help</a>
 				</div>
+                <div><h2>Your high score: <span data-bind="html: highScore.value"></span></p></div>
 			</header>
 			<div>
 				<div>
-					<lable data-bind="html: words.source"></lable><br/>
-                    <lable data-bind="html: words.hint"></lable>
-                    <div class="ok" data-bind="invisible: words.invisibleGreat">Pipa</div>
-                    <div class="wrong" data-bind="invisible: words.invisibleFail">Iksz <a  data-role="button" data-click="getWord">Get data</a></div>
-                    <br/>
-					<input id="meaning" type="text" data-bind="value: words.usrData" />
-					<a id="checkWord" data-role="button" data-click="checkWord">Check</a>
+					<p>Hungarian: <label data-bind="html: words.source"></label></p>
+                    <div>
+                        <p>
+                            <span>Hint: <label class="letter-space" data-bind="html: words.hint"></label></span>        
+                        </p>
+                    </div>
+                    <div>
+                        <p>
+                            <span>Your result: <span class="ok" data-bind="invisible: words.invisibleGreat">Pipa</span><span class="wrong" data-bind="invisible: words.invisibleFail">X</span></span>
+                        </p>
+                    </div>
+                    <div>
+                        <p>
+					        <input id="meaning" type="text" data-bind="value: words.usrData" class="block full-width" />
+                        </p>
+                    </div>
+                    <div>
+                        <p>
+					        <a id="checkWord" data-role="button" data-click="checkWord" class="btn-medium">Check</a>
+                            <a data-role="button" data-click="getWord">Next word</a>
+                        </p>
+                    </div>
 				</div>
 			</div>
 		</div>

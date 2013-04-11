@@ -24,3 +24,18 @@ body
     color: black;
     padding: 7px;
 }
+
+.input-field {
+    margin: 5px 0 0;
+}
+
+.block { display: block; }
+.margin10 { margin: 10px; }
+
+.letter-space {
+    letter-spacing: 2px;
+}
+
+.full-width {
+    width: 95%;
+}
