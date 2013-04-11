@@ -5,7 +5,6 @@
 		<meta charset="utf-8" />
 		<script src="cordova.js"></script>
 		<script src="kendo/js/jquery.min.js"></script>
-        <script src="kendo/js/jquery.maskedinput.min.js"></script>
 		<script src="kendo/js/kendo.mobile.min.js"></script>
 
 		<script src="http://include.jaydata.org/datajs-1.0.3.min.js" type="text/javascript"></script>
@@ -52,7 +51,7 @@
 					Statistics
 					<ul>
 						<li data-icon="globe">
-							<a href="HighScores.html" data-role="button">High scors</a>
+							<a href="HighScores.html" data-role="button">High scores</a>
 						</li>
 						<li data-icon="globe">
 							<a>My statistics</a>
@@ -65,23 +64,21 @@
 		<div data-role="view" id="tabstrip-wordlearn" data-title="Word learn" data-model="wordLearnViewModel" data-show="initWordLearnView">
 			<header>
 				<button data-role="backbutton">Back</button>
-				<div data-bind="html: highScore.value">86</div>
+				<div>Your high score: <span data-bind="html: highScore.value"></span></div>
 				<div>
-					<a data-role="button" data-click="navToHi">High scores</a>
+					<a href="HighScores.html" data-role="button">High scores</a>
+                    <a data-role="button" data-click="getHelp">Help</a>
 				</div>
 			</header>
 			<div>
 				<div>
-					<lable data-bind="html: words.source">table</lable>
+					<lable data-bind="html: words.source"></lable><br/>
+                    <lable data-bind="html: words.hint"></lable>
+                    <div class="ok" data-bind="invisible: words.invisibleGreat">Pipa</div>
+                    <div class="wrong" data-bind="invisible: words.invisibleFail">Iksz <a  data-role="button" data-click="getWord">Get data</a></div>
+                    <br/>
 					<input id="meaning" type="text" data-bind="value: words.usrData" />
 					<a id="checkWord" data-role="button" data-click="checkWord">Check</a>
-				</div>
-				<div data-bind="invisible: words.invisibleGreat">
-					Great!
-				</div>
-				<div data-bind="invisible: words.invisibleFail">
-					Hehhhe wrong: <span data-bind="html:words.meaning"></span>
-					<a  data-role="button" data-click="getWord">Get data</a>
 				</div>
 			</div>
 		</div>

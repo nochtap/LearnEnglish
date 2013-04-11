@@ -69,7 +69,7 @@ function initStorm(usr, psw) {
 function initWordLearnView() {
 	window.wordLearnViewModel = kendo.observable({
 		highScore:{value:0},
-		words:{source:'', meening:'', usrData:'', invisibleGreat:true, invisibleFail:true}
+		words:{source:'', meening:'', usrData:'', hint:'', invisibleGreat:true, invisibleFail:true, help:false}
 	});
 	kendo.bind($("#tabstrip-wordlearn"), wordLearnViewModel, kendo.mobile.ui);
 	getWord();
@@ -83,14 +83,14 @@ function getWord() {
 			console.log(JSON.stringify(items));
 			var hunWord = items[0].Lang == 'hu' ? items[0] : items[1];
 			var engWord = items[0].Lang == 'en' ? items[0] : items[1];
-            wordLearnViewModel.words.set("source", hunWord.Text);
-            wordLearnViewModel.words.set("meaning", engWord.Text);
-            wordLearnViewModel.words.set("usrData", '');
-            wordLearnViewModel.words.set("invisibleGreat", true);
-            wordLearnViewModel.words.set("invisibleFail", true);
-			$('#meaning').mask(engWord.Text.replace(/[^ ]/g, '*'));
-            $('#meaning').focus();
-            
+			wordLearnViewModel.words.set("source", hunWord.Text);
+			wordLearnViewModel.words.set("meaning", engWord.Text);
+			wordLearnViewModel.words.set("usrData", '');
+			wordLearnViewModel.words.set("invisibleGreat", true);
+			wordLearnViewModel.words.set("invisibleFail", true);
+			wordLearnViewModel.words.set("help", false);
+			wordLearnViewModel.words.set("hint", engWord.Text.replace(/[^ ]/g, '_'));
+			$('#meaning').focus();
 		});
 	});
 }
@@ -125,23 +125,44 @@ function checkWord() {
 	if (wordLearnViewModel) {
 		if (wordLearnViewModel.words.meaning == wordLearnViewModel.words.usrData) {
 			wordLearnViewModel.words.set("invisibleGreat", false);
-			sethighScore(3);
+			wordLearnViewModel.words.set("hint", wordLearnViewModel.words.meaning);
+			sethighScore(wordLearnViewModel.words.help?1:3);
 			setTimeout(function() {
 				getWord();
 			}, 2000);
 		}
 		else {
 			wordLearnViewModel.words.set("invisibleFail", false);
+			wordLearnViewModel.words.set("hint", wordLearnViewModel.words.meaning);
 			sethighScore(-5);
 		}
 	}
 	console.log(JSON.stringify(wordLearnViewModel.words));
 }
 
+function getHelp() {
+	var chrIndex = -1;
+	var origHint = wordLearnViewModel.words.hint.split('');
+	var spaceNum = origHint.reduce(function(prevValue, currentValue) {
+		return currentValue == '_'?++prevValue:prevValue;
+	}, 0);
+	if (spaceNum / wordLearnViewModel.words.meaning.length <= 0.4) {
+		return;
+	}
+    
+	while (chrIndex < 0 || (chrIndex >= 0 && origHint[chrIndex] != '_')) {
+		chrIndex = getRandom(0, wordLearnViewModel.words.meaning.length - 1);
+	}
+	origHint[chrIndex] = wordLearnViewModel.words.meaning[chrIndex];
+	wordLearnViewModel.words.set("hint", origHint.join(''));
+	wordLearnViewModel.words.set("help", true);
+	$('#meaning').focus();
+}
+
 function getRandom(min, max) {
 	return min + Math.floor(Math.random() * (max - min + 1));
 }
 
-function navToHi(){
-    app.navigate("highScores.html");
+function navToHi() {
+	app.navigate("highScores.html");
 }

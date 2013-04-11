@@ -63,7 +63,6 @@
   <ItemGroup>
     <Content Include="HighScores.html" />
     <Content Include="index.html" />
-    <Content Include="kendo\js\jquery.maskedinput.min.js" />
     <Content Include="kendo\js\jquery.min.js" />
     <Content Include="kendo\js\kendo.mobile.min.js" />
     <Content Include="kendo\styles\images\back.png" />
