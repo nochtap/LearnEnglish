@@ -1,0 +1,11 @@
+<div data-role="view" id="tabstrip-highScore" data-init="initStatistics" data-title="Login">
+	<a data-role="backbutton">Back</a>
+	<ul id="highscore-listview"></ul>
+	<script type="text/x-kendo-template" id="highscoreListViewTemplate">
+		<div>
+			<h4 class="item-title">${Connection}</h4>
+			<p class="item-info">#=((Attempt - Wrong) / Attempt)*100#%</p>
+		</div>
+	
+	</script>
+</div>

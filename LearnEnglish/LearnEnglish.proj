@@ -61,6 +61,7 @@
     <Resource Include="App_Resources\Android\drawable-nodpi\splashscreen.9.png" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="statistics.html" />
     <Content Include="HighScores.html" />
     <Content Include="index.html" />
     <Content Include="kendo\js\jquery.min.js" />
@@ -69,6 +70,7 @@
     <Content Include="kendo\styles\images\KendoUI.ttf" />
     <Content Include="kendo\styles\images\KendoUI.woff" />
     <Content Include="kendo\styles\kendo.mobile.all.min.css" />
+    <Content Include="scripts\statistics.js" />
     <Content Include="scripts\highScores.js" />
     <Content Include="scripts\index.js" />
     <Content Include="scripts\localStorage.js" />
