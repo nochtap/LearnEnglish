@@ -80,6 +80,7 @@ function getWord() {
 		stormDb.Statistics.filter('it.UserName == this.usr', {usr:logininfo.UserName}).toArray(function(statistics) {
 			var rndTable = [];
 			var maxNum = 0;
+			var connectionCnt = connections.length;
 			console.log("STAT", statistics);
 			connections.forEach(function(connection) {
 				var stat = null;
@@ -91,16 +92,19 @@ function getWord() {
 				if (stat == null) {
 					stat = {Attempt:1, Wrong:1};
 				}
-				var connectionStat = Math.round((stat.Wrong / stat.Attempt) * 10);
-                if(connectionStat == 0){connectionStat = 1;}
+                var connectionStat = Math.round((stat.Wrong / stat.Attempt) * connectionCnt);
+                if(stat.Attempt<=3 && connectionStat<connectionCnt){
+                    connectionStat = connectionCnt;
+                }
+				if (connectionStat == 0) {
+					connectionStat = 1;
+				}
 				rndTable.push({connectionId:connection.id, stat:connectionStat, min:maxNum, max:maxNum + connectionStat - 1});
 				maxNum += connectionStat;
-				console.log(connection);
 			});
 			console.log(rndTable);
-			console.log(maxNum);
+			console.log(maxNum, connectionCnt);
             
-			//var idx = getRandom(0, connections.length - 1);
 			var rndNum = getRandom(0, maxNum - 1);
 			var idx = -1;
 			var i = 0;
@@ -151,7 +155,7 @@ function sethighScore(value, id) {
 		stormDb.saveChanges({
 			success:function() {
 				wordLearnViewModel.highScore.set("value", score.Score);
-                setStatistics(value, id);
+				setStatistics(value, id);
 				console.log("!!new score: " + JSON.stringify(items));
 			},
 			error:function() {
@@ -162,20 +166,31 @@ function sethighScore(value, id) {
 	});
 }
 
-function setStatistics(value, id){
-    stormDb.Statistics.filter("it.UserName == this.usr && it.Connection == this.connectionId", {usr:logininfo.UserName, connectionId:id}).toArray(function(statistics) {
+function setStatistics(value, id) {
+	stormDb.Statistics.filter("it.UserName == this.usr && it.Connection == this.connectionId", {usr:logininfo.UserName, connectionId:id}).toArray(function(statistics) {
 		var stat = null;
 		if (statistics.length > 0) {
 			stat = statistics[0];
 			stormDb.Statistics.attach(stat);
 			stat.Attempt = stat.Attempt + 1;
-			stat.Wrong = value < 0?stat.Wrong + 1:stat.Wrong;
+			if (value < 0) {
+				stat.Wrong = stat.Wrong + 3;
+			}
+			else if (value == 3) {
+				stat.Wrong = stat.Wrong - 1;
+				if (stat.Wrong < 0) {
+					stat.Wrong = 0;
+				}
+			}
+            console.log("Stat update!!!");
 		}
 		else {
-			stat = new stormDb.Statistics.createNew({UserName:logininfo.UserName,Connection:id, Attempt:1, Wrong:value < 0?1:0 });
+			stat = new stormDb.Statistics.createNew({UserName:logininfo.UserName,Connection:id, Attempt:1, Wrong:value < 0?3:0 });
 			stormDb.Statistics.add(stat);
+            console.log("Stat new!!!");
 		}
-        stormDb.saveChanges();
+        console.log("New stat: ", stat);
+		stormDb.saveChanges();
 	});
 }
 
