@@ -39,13 +39,13 @@
 		<div data-role="view" id="tabstrip-mainPage" data-title="Geolocation">
 			<ul data-role="listview" data-style="inset" data-type="group">
 				<li>
-					Games
+					Exercises
 					<ul>
 						<li data-icon="toprated">
-							<a href="#tabstrip-wordlearn">Word learner</a>
+							<a href="#tabstrip-wordlearn">Learning words</a>
 						</li>
 						<li data-icon="toprated">
-							<a>Cross words</a>
+							<a>Use phrases</a>
 						</li>
 					</ul>
 				</li>
@@ -70,19 +70,19 @@
 					<a href="HighScores.html" data-role="button">High scores</a>
                     <a data-role="button" data-click="getHelp">Help</a>
 				</div>
-                <div><p>Your high score: <span data-bind="html: highScore.value"></span></p></div>
+                <div><p align="right">Your high score: <span data-bind="html: highScore.value"></span></p></div>
 			</header>
-			<div>
+			<div class="question">
 				<div>
-					<p>Hungarian: <label data-bind="html: words.source"></label></p>
+					<p align="center">Translate the following word:<br/><label class="labelstyle" data-bind="html: words.source"></label></p>
                     <div>
-                        <p>
-                            <span>Hint: <label class="letter-space" data-bind="html: words.hint"></label></span>        
+                        <p align="center">
+                            <span> </span> <label class="letter-space" data-bind="html: words.hint"></label></span>        
                         </p>
                     </div>
                     <div>
                         <p>
-                            <span>Your result: <span class="ok" data-bind="invisible: words.invisibleGreat">Pipa</span><span class="wrong" data-bind="invisible: words.invisibleFail">X</span></span>
+                            <span align="center">Your answer: <span class="ok" data-bind="invisible: words.invisibleGreat">Correct</span><span class="wrong" data-bind="invisible: words.invisibleFail">You aren't lucky!</span></span>
                         </p>
                     </div>
                     <div>
