@@ -69,6 +69,7 @@ function initStorm(usr, psw) {
 function initWordLearnView() {
 	window.wordLearnViewModel = kendo.observable({
 		highScore:{value:0},
+        
 		words:{source:'', meening:'', usrData:'', hint:'', invisibleGreat:true, invisibleFail:true, help:false, connectionId:''}
 	});
 	kendo.bind($("#tabstrip-wordlearn"), wordLearnViewModel, kendo.mobile.ui);
@@ -92,10 +93,10 @@ function getWord() {
 				if (stat == null) {
 					stat = {Attempt:1, Wrong:1};
 				}
-                var connectionStat = Math.round((stat.Wrong / stat.Attempt) * connectionCnt);
-                if(stat.Attempt<=3 && connectionStat<connectionCnt){
-                    connectionStat = connectionCnt;
-                }
+				var connectionStat = Math.round((stat.Wrong / stat.Attempt) * connectionCnt);
+				if (stat.Attempt <= 3 && connectionStat < connectionCnt) {
+					connectionStat = connectionCnt;
+				}
 				if (connectionStat == 0) {
 					connectionStat = 1;
 				}
@@ -104,7 +105,14 @@ function getWord() {
 			});
 			console.log(rndTable);
 			console.log(maxNum, connectionCnt);
-            
+			var progressBar = $("#progressbar").progressbar({
+				value: Math.round((connectionCnt/maxNum)*100)
+			});
+            if(!$("#progressbar .caption").get(0)){
+                progressBar.append("<div class='caption'>"+Math.round((connectionCnt/maxNum)*100)+"%</div>");
+            }else{
+                $("#progressbar .caption").html(Math.round((connectionCnt/maxNum)*100)+"%");
+            }
 			var rndNum = getRandom(0, maxNum - 1);
 			var idx = -1;
 			var i = 0;
@@ -134,6 +142,8 @@ function getWord() {
 				wordLearnViewModel.words.set("help", false);
 				wordLearnViewModel.words.set("hint", engWord.Text.replace(/[^ ]/g, '_'));
 				$('#meaning').focus();
+				$('#nextWord').hide();
+				$('#checkWord').show();
 			});
 		});
 	});
@@ -182,19 +192,21 @@ function setStatistics(value, id) {
 					stat.Wrong = 0;
 				}
 			}
-            console.log("Stat update!!!");
+			console.log("Stat update!!!");
 		}
 		else {
 			stat = new stormDb.Statistics.createNew({UserName:logininfo.UserName,Connection:id, Attempt:1, Wrong:value < 0?3:0 });
 			stormDb.Statistics.add(stat);
-            console.log("Stat new!!!");
+			console.log("Stat new!!!");
 		}
-        console.log("New stat: ", stat);
+		console.log("New stat: ", stat);
 		stormDb.saveChanges();
 	});
 }
 
 function checkWord() {
+	$('#checkWord').hide();
+	$('#nextWord').show();
 	if (wordLearnViewModel) {
 		if (wordLearnViewModel.words.meaning == wordLearnViewModel.words.usrData) {
 			wordLearnViewModel.words.set("invisibleGreat", false);
