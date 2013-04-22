@@ -81,8 +81,12 @@ function getWord() {
 		stormDb.Statistics.filter('it.UserName == this.usr', {usr:logininfo.UserName}).toArray(function(statistics) {
 			var rndTable = [];
 			var maxNum = 0;
+			var knowWord = 0;
 			var connectionCnt = connections.length;
-			console.log("STAT", statistics);
+			var maxAttempt = statistics.reduce(function(prevValue, currentValue) {
+				return prevValue + currentValue.Attempt
+			}, 0);
+			console.log("-= STAT maxAtempt: ", maxAttempt, statistics);
 			connections.forEach(function(connection) {
 				var stat = null;
 				var idx = 0;
@@ -98,7 +102,8 @@ function getWord() {
 					connectionStat = connectionCnt;
 				}
 				if (connectionStat == 0) {
-					connectionStat = 1;
+					connectionStat = Math.round(maxAttempt / stat.Attempt);
+					knowWord+=1;
 				}
 				rndTable.push({connectionId:connection.id, stat:connectionStat, min:maxNum, max:maxNum + connectionStat - 1});
 				maxNum += connectionStat;
@@ -106,13 +111,14 @@ function getWord() {
 			console.log(rndTable);
 			console.log(maxNum, connectionCnt);
 			var progressBar = $("#progressbar").progressbar({
-				value: Math.round((connectionCnt/maxNum)*100)
+				value: Math.round((knowWord / connectionCnt) * 100)
 			});
-            if(!$("#progressbar .caption").get(0)){
-                progressBar.append("<div class='caption'>"+Math.round((connectionCnt/maxNum)*100)+"%</div>");
-            }else{
-                $("#progressbar .caption").html(Math.round((connectionCnt/maxNum)*100)+"%");
-            }
+			if (!$("#progressbar .caption").get(0)) {
+				progressBar.append("<div class='caption'>" + Math.round((knowWord / connectionCnt) * 100) + "%</div>");
+			}
+			else {
+				$("#progressbar .caption").html(Math.round((knowWord / connectionCnt) * 100) + "%");
+			}
 			var rndNum = getRandom(0, maxNum - 1);
 			var idx = -1;
 			var i = 0;
