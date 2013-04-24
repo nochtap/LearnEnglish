@@ -4,25 +4,22 @@ body
 }
 
 .buttonArea,
-.footerText,
-#geoLocationContainer,
-#helloWorldInput,
-#helloWorldText
+.footerText
 {
 	text-align: center;
 }
 
 #txtName
 {
-	border: 1px solid #AAA;
-	border-radius: 15px;
-	position: static;
-	margin-left: 1em;
-	margin-top: 0.3em;
-	margin-bottom: 0.3em;
-	background: white;
-	color: black;
-	padding: 7px;
+    border: 1px solid #AAA;
+    border-radius: 15px;
+    position:static;
+    margin-left: 1em;
+    margin-top: 0.3em;
+    margin-bottom: 0.3em;
+    background:white;
+    color: black;
+    padding: 7px;
 }
 
 .input-field
@@ -38,7 +35,7 @@ body
 	letter-spacing: 10px;
 	text-align: center;
 	font-size: 22px;
-	color: #53005E;
+	color: #33B5E5;
 }
 
 .full-width
@@ -55,7 +52,7 @@ body
 {
 	text-align: center;
 	font-size: 22px;
-	color: #53005E;
+	color: #33B5E5;
 }
 #progressbar .caption
 {
@@ -63,4 +60,11 @@ body
 	left: 55px;
 	top: -25px;
 	display: inline;
+}
+.km-android .km-navbar .km-leftitem .km-back
+{
+    visibility:collapse;
+}
+.km-ios #tabstrip-statistics .km-view-title>span{
+    padding-left: 20px;
 }

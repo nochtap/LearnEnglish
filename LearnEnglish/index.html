@@ -21,8 +21,8 @@
 		<link href="styles/main.css" rel="stylesheet" />
 	</head>
 	<body>
-		<div data-role="view" id="tabstrip-login" data-title="Login">
-			<h1>Login</h1>
+		<div data-role="view" id="tabstrip-login" data-title="Login" style="text-align:center">
+			<h1>Learn english</h1>
 			<div id='helloWorldInput'>
 				<label for="txtName" style="display: block;">Enter your name:</label>
 				<input type="text" id="txtName" value="" data-bind="value: UserName" class="input-field"/>
@@ -38,91 +38,17 @@
 			</div>
 		</div>
 
-		<div data-role="view" id="tabstrip-mainPage" data-title="Geolocation">
-			<ul data-role="listview" data-style="inset" data-type="group">
-				<li>
-					Exercises
-					<ul>
-						<li data-icon="toprated">
-							<a href="#tabstrip-wordlearn">Learning words</a>
-						</li>
-						<li data-icon="toprated">
-							<a>Use phrases</a>
-						</li>
-					</ul>
-				</li>
-				<li>
-					Statistics
-					<ul>
-						<li data-icon="globe">
-							<a href="HighScores.html" data-role="button">High scores</a>
-						</li>
-						<li data-icon="globe">
-							<a href="statistics.html" data-role="button">My statistics</a>
-						</li>
-					</ul>
-				</li>
-			</ul>
-		</div>
-
-		<div data-role="view" id="tabstrip-wordlearn" data-title="Word learn" data-model="wordLearnViewModel" data-show="initWordLearnView">
-			<header>
-				<div class="margin10">
-					<button data-role="backbutton" class="iblock">Back</button>
-					<a href="HighScores.html" data-role="button">High scores</a>
-					<a data-role="button" data-click="getHelp">Help</a>
-				</div>
-				<div>
-					<p align="left" style="display:inline;width:45%">
-						Your high score: <span data-bind="html: highScore.value"></span>
-					</p>
-					<div id="progressbar" style="display:inline-block;width:45%"></div>
-				</div>
-
-			</header>
-			<div class="question">
-				<div>
-					<p align="center">
-						Translate the following word:<br/>
-						<label class="labelstyle" data-bind="html: words.source"></label>
-					</p>
-					<div>
-						<p align="center">
-							<span> </span>
-							<label class="letter-space" data-bind="html: words.hint"></label>
-						</p>
-					</div>
-					<div>
-						<p>
-							<span align="center">Your answer: <span class="ok" data-bind="invisible: words.invisibleGreat">Correct</span><span class="wrong" data-bind="invisible: words.invisibleFail">You aren't lucky!</span></span>
-						</p>
-					</div>
-					<div>
-						<p>
-							<input id="meaning" type="text" data-bind="value: words.usrData" class="block full-width" />
-						</p>
-					</div>
-					<div>
-						<p>
-							<a id="checkWord" data-role="button" data-click="checkWord" class="btn-medium">Check</a>
-							<a id="nextWord" data-role="button" data-click="getWord">Next word</a>
-						</p>
-					</div>
-				</div>
-			</div>
-		</div>
-
 		<div data-role="layout" data-id="mobile-tabstrip">
 			<header data-role="header">
-				<div data-role="navbar">
+				<div id="nb" data-role="navbar">
 					<span data-role="view-title"></span>
 				</div>
 			</header>
 
-			<div data-role="footer">
-				<div data-role="tabstrip">
-					<a href="#tabstrip-login" data-icon="share">Login</a>
-					<a href="#tabstrip-mainPage" data-icon="globe">Games</a>
+			<div id="footer" data-role="footer">
+				<div id="tabStrip" data-role="tabstrip" style="display:none;">
+					<a href="gameSelector.html" data-icon="globe">Games</a>
+                    <a href="highScores.html" data-icon="toprated">High scores</a>
 				</div>
 			</div>
 		</div>

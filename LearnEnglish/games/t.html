@@ -1,0 +1,62 @@
+<div data-role="view" id="modalview-setting" data-title="Settings" data-model="wordLearnViewModel">
+	<div data-role="header">
+		<div data-role="navbar">
+            <button data-role="backbutton">Back</button>
+			<span data-role="view-title"></span>
+		</div>
+	</div>
+
+	<ul data-role="listview" data-style="inset">
+		<li>
+			<label for="username">New words:</label>
+			<input data-bind="checked:settings.newWord" data-role="switch" id="newWord-switch" checked="checked" />
+		</li>
+		<li>
+			<label for="password">Unknown words:</label>
+			<input data-bind="checked:settings.unknownWord" data-role="switch" id="unknownWord-switch" checked="checked" />
+		</li>
+		<li>
+			<label for="password">Known words:</label>
+			<input data-bind="checked:settings.known" data-role="switch" id="knownWord-switch" checked="checked" />
+		</li>
+	</ul>
+	<h3>Word types</h3>
+	<ul data-role="listview" data-style="inset">
+		<li>
+			<label>
+				Word
+				<input data-bind="checked:settings.wordType" value="word" type="checkbox"/>
+			</label>
+		</li>
+		<li>
+			<label>
+				Preposition
+				<input data-bind="checked:settings.wordType" value="preposition" type="checkbox"/>
+			</label>
+		</li>
+		<li>
+			<label>
+				Phrase
+				<input data-bind="checked:settings.wordType" value="phrase" type="checkbox"/>
+			</label>
+		</li>
+		<li>
+			<label>
+				Verb
+				<input data-bind="checked:settings.wordType" value="verb" type="checkbox"/>
+			</label>
+		</li>
+		<li>
+			<label>
+				Noun
+				<input data-bind="checked:settings.wordType" value="noun" type="checkbox"/>
+			</label>
+		</li>
+        <li>
+			<label>
+				Adjective
+				<input data-bind="checked:settings.wordType" value="adjective" type="checkbox"/>
+			</label>
+		</li>
+	</ul>
+</div>

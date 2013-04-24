@@ -1,0 +1,12 @@
+<div data-role="view" id="tabstrip-highScore" data-show="initHighScore" data-title="Login">
+	<header data-role="header">
+		<div data-role="navbar">
+			<a data-role="backbutton">Back</a>
+		</div>
+	</header>
+	<ul id="highscore-listview"></ul>
+	<script type="text/x-kendo-template" id="highscoreListViewTemplate">
+		<h4 class="item-title">${UserName}</h4>
+		<p class="item-info">${Score}</p>
+	</script>
+</div>

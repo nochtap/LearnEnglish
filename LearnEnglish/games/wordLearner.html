@@ -1,0 +1,47 @@
+<div data-role="view" id="tabstrip-wordlearn" data-title="Word learn" data-model="wordLearnViewModel" data-show="initWordLearnView">
+	<header data-role="header">
+		<div data-role="navbar">
+			<button data-align="left" data-role="backbutton">Back</button>
+			<span data-role="view-title"></span>
+			<a data-align="left" data-role="button" data-icon="settings" href="games/t.html"></a>
+			<a data-align="right" data-role="button" data-icon="featured" href="games/wordLearnerStat.html" data-bind="click:newProject"></a>
+		</div>
+	</header>
+	<div class="question">
+		<div>
+			<p align="left" style="display:inline;width:45%">
+				Your high score: <span data-bind="html: highScore.value"></span>
+			</p>
+			<div id="progressbar" style="display:inline-block;width:45%"></div>
+		</div>
+		<div>
+			<p align="center">
+				Translate the following word:<br/>
+				<label class="labelstyle" data-bind="html: words.source"></label>
+			</p>
+			<div>
+				<p align="center">
+					<span> </span>
+					<label class="letter-space" data-bind="html: words.hint"></label>
+				</p>
+			</div>
+			<div>
+				<p>
+					<span align="center">Your answer: <span class="ok" data-bind="invisible: words.invisibleGreat">Correct</span><span class="wrong" data-bind="invisible: words.invisibleFail">You aren't lucky!</span></span>
+				</p>
+			</div>
+			<div>
+				<p>
+					<input id="meaning" type="text" data-bind="value: words.usrData" class="block full-width" />
+				</p>
+			</div>
+			<div>
+				<p style="text-align: right">
+					<a id="checkWord" data-role="button" data-click="checkWord" class="btn-medium">Check</a>
+					<a id="nextWord" data-role="button" data-click="getWord">Next word</a>
+					<a data-role="button" data-click="getHelp">Help</a>
+				</p>
+			</div>
+		</div>
+	</div>
+</div>

@@ -14,6 +14,7 @@ function initLocalStore() {
 }
 
 function login() {
+	app.showLoading();
 	try {
 		info.UserName = logininfo.UserName;
 		info.Password = logininfo.Password;
@@ -52,14 +53,9 @@ function initStorm(usr, psw) {
 	console.log("LOGIN INFO");
 	console.log(JSON.stringify(credentials));
 	$data.initService(apiKey, credentials).then(function(mydatabase, factory, type) {
-		// "mydatabase" is your data context
-		// "factory" is a context factory method
-		// "type" is your context type
 		window.stormDb = mydatabase;
-		app.navigate("#tabstrip-mainPage");
-		//mydatabase.Words.toArray(function(items) {
-		//	alert(items[0].Text);            
-		//});
+		$('#tabStrip').show();
+		app.navigate("gameSelector.html");
 	}).fail(function(err) {
 		alert('Connection failed.');
 		console.error(err);
@@ -67,15 +63,23 @@ function initStorm(usr, psw) {
 }
 
 function initWordLearnView() {
+	$('#tabStrip').hide();
 	window.wordLearnViewModel = kendo.observable({
 		highScore:{value:0},
-        
-		words:{source:'', meening:'', usrData:'', hint:'', invisibleGreat:true, invisibleFail:true, help:false, connectionId:''}
+		words:{source:'', meening:'', usrData:'', hint:'', invisibleGreat:true, invisibleFail:true, help:false, connectionId:'', prevConnectionId:''},
+		settings:{
+			newWord:true,
+			unknownWord:true,
+			known:true,
+			wordType:['word', 'preposition', 'phrase', 'verb', 'noun', 'adjective']
+		}
 	});
 	kendo.bind($("#tabstrip-wordlearn"), wordLearnViewModel, kendo.mobile.ui);
 	getWord();
 }
-
+function closeModalViewSetting () {
+	$("#modalview-setting").kendoMobileModalView("close");
+}
 function getWord() {
 	stormDb.Connections.toArray(function(connections) {
 		stormDb.Statistics.filter('it.UserName == this.usr', {usr:logininfo.UserName}).toArray(function(statistics) {
@@ -86,7 +90,8 @@ function getWord() {
 			var maxAttempt = statistics.reduce(function(prevValue, currentValue) {
 				return prevValue + currentValue.Attempt
 			}, 0);
-			console.log("-= STAT maxAtempt: ", maxAttempt, statistics);
+			var avgAttempt = Math.round(maxAttempt / connectionCnt);
+			console.log("-= STAT maxAtempt: ", maxAttempt, 'conCnt: ', connectionCnt, "avgAttempt: ", avgAttempt);
 			connections.forEach(function(connection) {
 				var stat = null;
 				var idx = 0;
@@ -102,14 +107,17 @@ function getWord() {
 					connectionStat = connectionCnt;
 				}
 				if (connectionStat == 0) {
-					connectionStat = Math.round(maxAttempt / stat.Attempt);
+					connectionStat = Math.round(avgAttempt * (avgAttempt / stat.Attempt));
 					knowWord+=1;
 				}
-				rndTable.push({connectionId:connection.id, stat:connectionStat, min:maxNum, max:maxNum + connectionStat - 1});
+				else {
+					connectionStat += avgAttempt;
+				}
+				rndTable.push({connectionId:connection.id, stat:connectionStat, min:maxNum, max:maxNum + connectionStat - 1, attempt:stat.Attempt});
 				maxNum += connectionStat;
 			});
-			console.log(rndTable);
-			console.log(maxNum, connectionCnt);
+			//console.log(rndTable);
+			//console.log(maxNum, connectionCnt);
 			var progressBar = $("#progressbar").progressbar({
 				value: Math.round((knowWord / connectionCnt) * 100)
 			});
@@ -119,22 +127,26 @@ function getWord() {
 			else {
 				$("#progressbar .caption").html(Math.round((knowWord / connectionCnt) * 100) + "%");
 			}
-			var rndNum = getRandom(0, maxNum - 1);
-			var idx = -1;
-			var i = 0;
-			console.log("Random unmber: ", rndNum);
-			while (idx < 0 && i < rndTable.length) {
-				if (rndTable[i].min <= rndNum && rndTable[i].max >= rndNum) {
-					idx = i;
+            
+			var wordCon = null;
+			while (wordCon == null || (wordCon != null && wordCon.id == wordLearnViewModel.words.prevConnectionId)) {
+				var idx = -1;
+				var rndNum = getRandom(0, maxNum - 1);
+				var i = 0;
+				console.log("Random unmber: ", rndNum);
+				while (idx < 0 && i < rndTable.length) {
+					if (rndTable[i].min <= rndNum && rndTable[i].max >= rndNum) {
+						idx = i;
+					}
+					i++;
 				}
-				i++;
+				if (idx < 0) {
+					console.log("not found connection");
+					idx = 0;
+				}
+				wordCon = connections[idx];
 			}
-			if (idx < 0) {
-				console.log("not found connection");
-				idx = 0;
-			}
-			console.log(idx);
-			var wordCon = connections[idx];
+			wordLearnViewModel.words.set("prevConnectionId", wordCon.id);
 			stormDb.Words.filter("it.id in this.ids", {ids:[wordCon.Source,wordCon.Target]}).toArray(function(items) {
 				console.log(JSON.stringify(items));
 				var hunWord = items[0].Lang == 'hu' ? items[0] : items[1];
@@ -212,7 +224,7 @@ function setStatistics(value, id) {
 
 function checkWord() {
 	$('#checkWord').hide();
-	$('#nextWord').show();
+	$('#nextWord').hide();
 	if (wordLearnViewModel) {
 		if (wordLearnViewModel.words.meaning == wordLearnViewModel.words.usrData) {
 			wordLearnViewModel.words.set("invisibleGreat", false);
@@ -223,6 +235,7 @@ function checkWord() {
 			}, 2000);
 		}
 		else {
+			$('#nextWord').show();
 			wordLearnViewModel.words.set("invisibleFail", false);
 			wordLearnViewModel.words.set("hint", wordLearnViewModel.words.meaning);
 			sethighScore(-5, wordLearnViewModel.words.connectionId);

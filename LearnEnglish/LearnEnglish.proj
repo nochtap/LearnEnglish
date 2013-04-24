@@ -36,6 +36,7 @@
     <Folder Include="App_Resources\Android\drawable-nodpi">
       <Platform>Android</Platform>
     </Folder>
+    <Folder Include="games" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="App_Resources\iOS\icon.png" />
@@ -60,8 +61,11 @@
     <Resource Include="App_Resources\Android\drawable-ldpi\icon.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="statistics.html" />
-    <Content Include="HighScores.html" />
+    <Content Include="gameSelector.html" />
+    <Content Include="games\t.html" />
+    <Content Include="games\wordLearner.html" />
+    <Content Include="games\wordLearnerStat.html" />
+    <Content Include="highScores.html" />
     <Content Include="index.html" />
     <Content Include="kendo\js\jquery.min.js" />
     <Content Include="kendo\js\kendo.mobile.min.js" />

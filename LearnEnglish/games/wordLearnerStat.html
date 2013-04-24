@@ -1,0 +1,26 @@
+<div data-role="view" id="tabstrip-statistics" data-title="Word learner statistics" data-model="statistics" data-show="initStatistics" data-title="Statistics">
+	<header data-role="header">
+		<div data-role="navbar">
+			<button data-role="backbutton">Back</button>
+			<span data-role="view-title"></span>
+		</div>
+	</header>
+    <fieldset>
+        <legend>Statistics</legend>
+        <p><span>All words count:</span><span data-bind="html:allWords"></span></p>
+        <p><span>Known words count:</span><span data-bind="html:knownWords"></span></p>
+    </fieldset>
+    <h3>Unknown word list</h3>
+	<ul id="statistics-listview"></ul>
+	<script type="text/x-kendo-template" id="statisticsListViewTemplate">
+		<div>
+			<h4 class="item-title">
+				<span class="item-info">#=((Attempt - Wrong) / Attempt)*100#%</span>
+				(<span class="item-info">#=Attempt#</span> / <span class="item-info">#=Wrong#</span>)
+			</h4>
+			<p>#:Source#</p>
+			<p>#:Target#</p>
+		</div>
+
+	</script>
+</div>
