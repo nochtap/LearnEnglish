@@ -1,5 +1,14 @@
 document.addEventListener("deviceready", onDeviceReady, false);
-
+window.wordLearnViewModel = kendo.observable({
+		highScore:{value:0},
+		words:{source:'', meening:'', usrData:'', hint:'', invisibleGreat:true, invisibleFail:true, help:false, connectionId:'', prevConnectionId:''},
+		settings:{
+			newWord:true,
+			unknownWord:true,
+			known:true,
+			wordType:['word', 'preposition', 'phrase', 'verb', 'noun', 'adjective']
+		}
+	});
 function onDeviceReady() {
 	initLocalStore();
 }
@@ -64,16 +73,7 @@ function initStorm(usr, psw) {
 
 function initWordLearnView() {
 	$('#tabStrip').hide();
-	window.wordLearnViewModel = kendo.observable({
-		highScore:{value:0},
-		words:{source:'', meening:'', usrData:'', hint:'', invisibleGreat:true, invisibleFail:true, help:false, connectionId:'', prevConnectionId:''},
-		settings:{
-			newWord:true,
-			unknownWord:true,
-			known:true,
-			wordType:['word', 'preposition', 'phrase', 'verb', 'noun', 'adjective']
-		}
-	});
+	
 	kendo.bind($("#tabstrip-wordlearn"), wordLearnViewModel, kendo.mobile.ui);
 	getWord();
 }
@@ -81,89 +81,96 @@ function closeModalViewSetting () {
 	$("#modalview-setting").kendoMobileModalView("close");
 }
 function getWord() {
-	stormDb.Connections.toArray(function(connections) {
-		stormDb.Statistics.filter('it.UserName == this.usr', {usr:logininfo.UserName}).toArray(function(statistics) {
-			var rndTable = [];
-			var maxNum = 0;
-			var knowWord = 0;
-			var connectionCnt = connections.length;
-			var maxAttempt = statistics.reduce(function(prevValue, currentValue) {
-				return prevValue + currentValue.Attempt
-			}, 0);
-			var avgAttempt = Math.round(maxAttempt / connectionCnt);
-			console.log("-= STAT maxAtempt: ", maxAttempt, 'conCnt: ', connectionCnt, "avgAttempt: ", avgAttempt);
-			connections.forEach(function(connection) {
-				var stat = null;
-				var idx = 0;
-				while (stat == null && idx < statistics.length) {
-					stat = statistics[idx].Connection == connection.id?statistics[idx]:null;
-					idx++;
-				}
-				if (stat == null) {
-					stat = {Attempt:1, Wrong:1};
-				}
-				var connectionStat = Math.round((stat.Wrong / stat.Attempt) * connectionCnt);
-				if (stat.Attempt <= 3 && connectionStat < connectionCnt) {
-					connectionStat = connectionCnt;
-				}
-				if (connectionStat == 0) {
-					connectionStat = Math.round(avgAttempt * (avgAttempt / stat.Attempt));
-					knowWord+=1;
+	stormDb.Connections.filter("it.Type in this.wordType", {wordType:wordLearnViewModel.settings.wordType.toJSON()}).toArray({
+		success:function(connections) {
+			stormDb.Statistics.filter('it.UserName == this.usr', {usr:logininfo.UserName}).toArray(function(statistics) {
+				var rndTable = [];
+				var maxNum = 0;
+				var knowWord = 0;
+				var connectionCnt = connections.length;
+				var maxAttempt = statistics.reduce(function(prevValue, currentValue) {
+					return prevValue + currentValue.Attempt
+				}, 0);
+				var avgAttempt = Math.round(maxAttempt / connectionCnt);
+				console.log("-= STAT maxAtempt: ", maxAttempt, 'conCnt: ', connectionCnt, "avgAttempt: ", avgAttempt);
+				connections.forEach(function(connection) {
+					var stat = null;
+					var idx = 0;
+					while (stat == null && idx < statistics.length) {
+						stat = statistics[idx].Connection == connection.id?statistics[idx]:null;
+						idx++;
+					}
+					if (stat == null) {
+						stat = {Attempt:1, Wrong:1};
+					}
+					var connectionStat = Math.round((stat.Wrong / stat.Attempt) * connectionCnt);
+					if (stat.Attempt <= 3 && connectionStat < connectionCnt) {
+						connectionStat = connectionCnt;
+					}
+					if (connectionStat == 0) {
+						connectionStat = Math.round(avgAttempt * (avgAttempt / stat.Attempt));
+						knowWord+=1;
+					}
+					else {
+						connectionStat += avgAttempt;
+					}
+					rndTable.push({connectionId:connection.id, stat:connectionStat, min:maxNum, max:maxNum + connectionStat - 1, attempt:stat.Attempt});
+					maxNum += connectionStat;
+				});
+				
+				var progressBar = $("#progressbar").progressbar({
+					value: Math.round((knowWord / connectionCnt) * 100)
+				});
+				if (!$("#progressbar .caption").get(0)) {
+					progressBar.append("<div class='caption'>" + Math.round((knowWord / connectionCnt) * 100) + "%</div>");
 				}
 				else {
-					connectionStat += avgAttempt;
+					$("#progressbar .caption").html(Math.round((knowWord / connectionCnt) * 100) + "%");
 				}
-				rndTable.push({connectionId:connection.id, stat:connectionStat, min:maxNum, max:maxNum + connectionStat - 1, attempt:stat.Attempt});
-				maxNum += connectionStat;
-			});
-			//console.log(rndTable);
-			//console.log(maxNum, connectionCnt);
-			var progressBar = $("#progressbar").progressbar({
-				value: Math.round((knowWord / connectionCnt) * 100)
-			});
-			if (!$("#progressbar .caption").get(0)) {
-				progressBar.append("<div class='caption'>" + Math.round((knowWord / connectionCnt) * 100) + "%</div>");
-			}
-			else {
-				$("#progressbar .caption").html(Math.round((knowWord / connectionCnt) * 100) + "%");
-			}
             
-			var wordCon = null;
-			while (wordCon == null || (wordCon != null && wordCon.id == wordLearnViewModel.words.prevConnectionId)) {
-				var idx = -1;
-				var rndNum = getRandom(0, maxNum - 1);
-				var i = 0;
-				console.log("Random unmber: ", rndNum);
-				while (idx < 0 && i < rndTable.length) {
-					if (rndTable[i].min <= rndNum && rndTable[i].max >= rndNum) {
-						idx = i;
+				var wordCon = null;
+                var rerun = 0;
+				while (rerun<3 && (wordCon == null || (wordCon != null && wordCon.id == wordLearnViewModel.words.prevConnectionId))) {
+					var idx = -1;
+					var rndNum = getRandom(0, maxNum - 1);
+					var i = 0;
+					console.log("Random unmber: ", rndNum);
+					while (idx < 0 && i < rndTable.length) {
+						if (rndTable[i].min <= rndNum && rndTable[i].max >= rndNum) {
+							idx = i;
+						}
+						i++;
 					}
-					i++;
+					if (idx < 0) {
+						console.log("not found connection");
+						idx = 0;
+					}
+					wordCon = connections[idx];
+                    rerun = rerun+1;
+                    console.log("rerun count:", rerun);
 				}
-				if (idx < 0) {
-					console.log("not found connection");
-					idx = 0;
-				}
-				wordCon = connections[idx];
-			}
-			wordLearnViewModel.words.set("prevConnectionId", wordCon.id);
-			stormDb.Words.filter("it.id in this.ids", {ids:[wordCon.Source,wordCon.Target]}).toArray(function(items) {
-				console.log(JSON.stringify(items));
-				var hunWord = items[0].Lang == 'hu' ? items[0] : items[1];
-				var engWord = items[0].Lang == 'en' ? items[0] : items[1];
-				wordLearnViewModel.words.set("connectionId", wordCon.id);
-				wordLearnViewModel.words.set("source", hunWord.Text);
-				wordLearnViewModel.words.set("meaning", engWord.Text);
-				wordLearnViewModel.words.set("usrData", '');
-				wordLearnViewModel.words.set("invisibleGreat", true);
-				wordLearnViewModel.words.set("invisibleFail", true);
-				wordLearnViewModel.words.set("help", false);
-				wordLearnViewModel.words.set("hint", engWord.Text.replace(/[^ ]/g, '_'));
-				$('#meaning').focus();
-				$('#nextWord').hide();
-				$('#checkWord').show();
-			});
-		});
+				wordLearnViewModel.words.set("prevConnectionId", wordCon.id);
+				stormDb.Words.filter("it.id in this.ids", {ids:[wordCon.Source,wordCon.Target]}).toArray(function(items) {
+					console.log(JSON.stringify(items));
+					var hunWord = items[0].Lang == 'hu' ? items[0] : items[1];
+					var engWord = items[0].Lang == 'en' ? items[0] : items[1];
+					wordLearnViewModel.words.set("connectionId", wordCon.id);
+					wordLearnViewModel.words.set("source", hunWord.Text);
+					wordLearnViewModel.words.set("meaning", engWord.Text);
+					wordLearnViewModel.words.set("usrData", '');
+					wordLearnViewModel.words.set("invisibleGreat", true);
+					wordLearnViewModel.words.set("invisibleFail", true);
+					wordLearnViewModel.words.set("help", false);
+					wordLearnViewModel.words.set("hint", engWord.Text.replace(/[^ ]/g, '_'));
+					$('#meaning').focus();
+					$('#nextWord').hide();
+					$('#checkWord').show();
+				});
+			})
+		},
+		error:function() {
+            console.log("para", arguments);
+		}
 	});
 }
 
